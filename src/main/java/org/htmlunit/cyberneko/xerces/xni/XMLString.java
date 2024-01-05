@@ -701,7 +701,7 @@ public class XMLString implements CharSequence {
      *          {@code codePoint} is not a valid Unicode code point.
      */
     public XMLString appendCodePoint(final int value) {
-        if (value <= Character.MAX_VALUE) {
+        if (Character.isBmpCodePoint(value)) {
             return this.append((char) value);
         }
         else {
