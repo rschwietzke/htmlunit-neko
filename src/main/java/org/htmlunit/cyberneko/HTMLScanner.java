@@ -1695,9 +1695,9 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
 
         // Reads a single character.
         protected int read() throws IOException {
-            if (DEBUG_BUFFER) {
-                debugBufferIfNeeded("(read: ");
-            }
+//            if (DEBUG_BUFFER) {
+//                debugBufferIfNeeded("(read: ");
+//            }
             if (offset_ == length_) {
                 if (endReached_) {
                     return -1;
@@ -1713,9 +1713,9 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
             characterOffset_++;
             columnNumber_++;
 
-            if (DEBUG_BUFFER) {
-                debugBufferIfNeeded(")read: ", " -> " + c);
-            }
+//            if (DEBUG_BUFFER) {
+//                debugBufferIfNeeded(")read: ", " -> " + c);
+//            }
             return c;
         }
 
