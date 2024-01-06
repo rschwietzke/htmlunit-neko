@@ -15,6 +15,7 @@
  */
 package org.htmlunit.cyberneko.io;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -76,7 +77,7 @@ public final class PlaybackInputStream extends InputStream {
 
     // Constructor.
     public PlaybackInputStream(final InputStream in) {
-        this.in = in;
+        this.in = new BufferedInputStream(in);
     }
 
     // Detect encoding.
