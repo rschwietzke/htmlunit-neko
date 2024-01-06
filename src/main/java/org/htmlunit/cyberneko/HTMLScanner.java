@@ -15,6 +15,8 @@
  */
 package org.htmlunit.cyberneko;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -501,7 +503,7 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
         final Reader reader = inputSource.getCharacterStream();
         if (reader == null) {
             try {
-                return new InputStreamReader(inputSource.getByteStream(), fJavaEncoding);
+                return new BufferedReader(new InputStreamReader(inputSource.getByteStream(), fJavaEncoding));
             }
             catch (final UnsupportedEncodingException e) {
                 // should not happen as this encoding is already used to parse the "main" source
@@ -779,7 +781,7 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
                 final URL url = new URL(expandedSystemId);
                 inputStream = url.openStream();
             }
-            fByteStream = new PlaybackInputStream(inputStream);
+            fByteStream = new PlaybackInputStream(new BufferedInputStream(inputStream));
             final String[] encodings = new String[2];
             if (encoding == null) {
                 fByteStream.detectEncoding(encodings);
@@ -805,7 +807,7 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
             fIANAEncoding = encodings[0];
             fJavaEncoding = encodings[1];
             encoding = fIANAEncoding;
-            reader = new InputStreamReader(fByteStream, fJavaEncoding);
+            reader = new BufferedReader(new InputStreamReader(fByteStream, fJavaEncoding));
         }
         fCurrentEntity = new CurrentEntity(reader, encoding, publicId, baseSystemId, literalSystemId, expandedSystemId);
 
@@ -1766,7 +1768,7 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
         }
 
         private void setStream(final InputStreamReader inputStreamReader) {
-            stream_ = inputStreamReader;
+            stream_ = new BufferedReader(inputStreamReader);
             offset_ = 0;
             length_ = 0;
             characterOffset_ = 0;
