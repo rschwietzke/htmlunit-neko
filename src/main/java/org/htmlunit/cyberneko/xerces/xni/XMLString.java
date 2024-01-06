@@ -701,20 +701,20 @@ public class XMLString implements CharSequence {
      *          {@code codePoint} is not a valid Unicode code point.
      */
     public XMLString appendCodePoint(final int value) {
-        if (Character.isBmpCodePoint(value)) {
-            return this.append((char) value);
-        }
-        else {
-            try {
-                final char[] chars = Character.toChars(value);
-                return this.append(chars, 0, chars.length);
-            }
-            catch (final IllegalArgumentException e) {
-                // when value is not valid as UTF-16
-                this.append(REPLACEMENT_CHARACTER);
-                throw e;
-            }
-        }
+    	if (Character.isBmpCodePoint(value)) {
+    		return this.append((char) value);
+    	}
+    	else if (Character.isValidCodePoint(value)) {
+    		// as seen in the JDK, avoid a char array in between
+    		this.append(Character.highSurrogate(value));
+    		this.append(Character.lowSurrogate(value));
+    		return this;
+    	}
+    	else {
+    		// when value is not valid as UTF-16
+    		this.append(REPLACEMENT_CHARACTER);
+    		throw new IllegalArgumentException();
+    	}
     }
 
     // this stuff is here for performance reasons to avoid a copy
