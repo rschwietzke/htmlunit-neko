@@ -169,24 +169,38 @@ public class XMLString implements CharSequence {
     }
 
     /**
+     * Appends a single character to the buffer but growing it first without
+     * checking if needed.
+     *
+     * @param c the character to append
+     * @return this instance
+     */
+    private XMLString growAndAppend(final char c) {
+        final int oldLength = this.length_++;
+
+        final int newSize = Math.max(oldLength + this.growBy_, (this.data_.length << 1) + 2);
+        this.data_ = Arrays.copyOf(this.data_, newSize);
+
+        this.data_[oldLength] = c;
+
+        return this;
+    }
+
+    /**
      * Appends a single character to the buffer.
      *
      * @param c the character to append
      * @return this instance
      */
     public XMLString append(final char c) {
-        final int oldLength = this.length_++;
+    	if (this.length_ < this.data_.length) {
+    		this.data_[this.length_++] = c;
+    	}
+    	else {
+    		growAndAppend(c);
+    	}
 
-        // ensureCapacity is not inlined by the compiler, so put that here for the most
-        // called method of all appends. Duplicate code, but for a reason.
-        if (oldLength == this.data_.length) {
-            final int newSize = Math.max(oldLength + this.growBy_, (this.data_.length << 1) + 2);
-            this.data_ = Arrays.copyOf(this.data_, newSize);
-        }
-
-        this.data_[oldLength] = c;
-
-        return this;
+    	return this;
     }
 
     /**
