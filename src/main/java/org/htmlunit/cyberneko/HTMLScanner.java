@@ -3002,6 +3002,7 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
                 boolean isStart = true;
                 boolean prevSpace = false;
                 final boolean lNormalizeAttributes_ = fNormalizeAttributes_;
+                final XMLString lStringBuffer = fStringBuffer;
                 do {
                     final boolean acceptSpace = !lNormalizeAttributes_ || (!isStart && !prevSpace);
                     c = fCurrentEntity.read();
@@ -3015,13 +3016,13 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
                     	case ' ':
                     	case '\t':
                             if (acceptSpace) {
-                                fStringBuffer.append(lNormalizeAttributes_ ? ' ' : (char) c);
+                                lStringBuffer.append(lNormalizeAttributes_ ? ' ' : (char) c);
                             }
                             prevSpace = true;
                             break;
                     	case '\n':
                             if (acceptSpace) {
-                                fStringBuffer.append(lNormalizeAttributes_ ? ' ' : '\n');
+                                lStringBuffer.append(lNormalizeAttributes_ ? ' ' : '\n');
                             }
                             fCurrentEntity.incLine();
                             prevSpace = true;
@@ -3035,7 +3036,7 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
                                 fCurrentEntity.rewind();
                             }
                             if (acceptSpace) {
-                                fStringBuffer.append(lNormalizeAttributes_ ? ' ' : '\n');
+                                lStringBuffer.append(lNormalizeAttributes_ ? ' ' : '\n');
                             }
                             fCurrentEntity.incLine();
                             prevSpace = true;
@@ -3045,7 +3046,7 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
 	                        final int ce = scanEntityRef(fStringBuffer2, false);
 	                        if (ce != -1) {
 	                            try {
-	                                fStringBuffer.appendCodePoint(ce);
+	                                lStringBuffer.appendCodePoint(ce);
 	                            }
 	                            catch (IllegalArgumentException e) {
 	                                if (fReportErrors_) {
@@ -3054,7 +3055,7 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
 	                            }
 	                        }
 	                        else {
-	                        	fStringBuffer.append(fStringBuffer2);
+	                        	lStringBuffer.append(fStringBuffer2);
 	                        }
 	                        prevSpace = false;
 	                        break;
@@ -3062,7 +3063,7 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
 		                    if (c != currentQuote) {
 		                        isStart = false;
 		                        try {
-		                            fStringBuffer.appendCodePoint(c);
+		                            lStringBuffer.appendCodePoint(c);
 		                        }
 		                        catch (IllegalArgumentException e) {
 		                            if (fReportErrors_) {
