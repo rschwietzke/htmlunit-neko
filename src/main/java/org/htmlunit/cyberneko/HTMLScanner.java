@@ -2920,7 +2920,7 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
                 }
                 aname = '=' + scanName(false);
             }
-            if (fReportErrors_ && !skippedSpaces) {
+            if (!skippedSpaces && fReportErrors_) {
                 fErrorReporter.reportError("HTML1013", new Object[] {aname});
             }
             aname = modifyName(aname, fNamesAttrs);
