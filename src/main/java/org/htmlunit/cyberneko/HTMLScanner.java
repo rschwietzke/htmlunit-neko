@@ -1698,7 +1698,14 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
 //            if (DEBUG_BUFFER) {
 //                debugBufferIfNeeded("(read: ");
 //            }
-            if (offset_ == length_) {
+            if (offset_ < length_) {
+                final char c = buffer_[offset_++];
+                characterOffset_++;
+                columnNumber_++;
+
+                return c;
+            }
+            else {
                 if (endReached_) {
                     return -1;
                 }
@@ -1708,15 +1715,17 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
                     }
                     return -1;
                 }
+                final char c = buffer_[offset_++];
+                characterOffset_++;
+                columnNumber_++;
+
+                return c;
             }
-            final char c = buffer_[offset_++];
-            characterOffset_++;
-            columnNumber_++;
 
 //            if (DEBUG_BUFFER) {
 //                debugBufferIfNeeded(")read: ", " -> " + c);
 //            }
-            return c;
+//            return ;
         }
 
         /** Prints the contents of the character buffer to standard out. */
