@@ -3001,8 +3001,9 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
                 final char quote = (char) c;
                 boolean isStart = true;
                 boolean prevSpace = false;
+                final boolean lNormalizeAttributes_ = fNormalizeAttributes_;
                 do {
-                    final boolean acceptSpace = !fNormalizeAttributes_ || (!isStart && !prevSpace);
+                    final boolean acceptSpace = !lNormalizeAttributes_ || (!isStart && !prevSpace);
                     c = fCurrentEntity.read();
                     if (c == -1) {
                         if (fReportErrors_) {
@@ -3012,7 +3013,7 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
                     }
                     if (c == ' ' || c == '\t') {
                         if (acceptSpace) {
-                            fStringBuffer.append(fNormalizeAttributes_ ? ' ' : (char) c);
+                            fStringBuffer.append(lNormalizeAttributes_ ? ' ' : (char) c);
                         }
                         prevSpace = true;
                     }
@@ -3027,7 +3028,7 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
                             }
                         }
                         if (acceptSpace) {
-                            fStringBuffer.append(fNormalizeAttributes_ ? ' ' : '\n');
+                            fStringBuffer.append(lNormalizeAttributes_ ? ' ' : '\n');
                         }
                         fCurrentEntity.incLine();
                         prevSpace = true;
@@ -3068,7 +3069,7 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
                 }
                 while (c != quote);
 
-                if (fNormalizeAttributes_ && fStringBuffer.length() > 0) {
+                if (lNormalizeAttributes_ && fStringBuffer.length() > 0) {
                     // trailing whitespace already normalized to single space
                     fStringBuffer.trimTrailing();
                 }
