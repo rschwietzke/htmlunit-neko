@@ -1693,6 +1693,23 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
             return count;
         }
 
+        protected int loadAndRead() throws IOException {
+        	if (endReached_) {
+        		return -1;
+        	}
+        	if (load(0) == -1) {
+        		if (DEBUG_BUFFER) {
+        			System.out.println(")read: -> -1");
+        		}
+        		return -1;
+        	}
+        	final char c = buffer_[offset_++];
+        	characterOffset_++;
+        	columnNumber_++;
+
+        	return c;
+        }
+
         // Reads a single character.
         protected int read() throws IOException {
 //            if (DEBUG_BUFFER) {
@@ -1706,20 +1723,7 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
                 return c;
             }
             else {
-                if (endReached_) {
-                    return -1;
-                }
-                if (load(0) == -1) {
-                    if (DEBUG_BUFFER) {
-                        System.out.println(")read: -> -1");
-                    }
-                    return -1;
-                }
-                final char c = buffer_[offset_++];
-                characterOffset_++;
-                columnNumber_++;
-
-                return c;
+            	return loadAndRead();
             }
 
 //            if (DEBUG_BUFFER) {
