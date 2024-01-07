@@ -3005,20 +3005,28 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
                 do {
                     final boolean acceptSpace = !lNormalizeAttributes_ || (!isStart && !prevSpace);
                     c = fCurrentEntity.read();
-                    if (c == -1) {
-                        if (fReportErrors_) {
-                            fErrorReporter.reportError("HTML1007", null);
-                        }
-                        throw new EOFException();
-                    }
-                    if (c == ' ' || c == '\t') {
-                        if (acceptSpace) {
-                            fStringBuffer.append(lNormalizeAttributes_ ? ' ' : (char) c);
-                        }
-                        prevSpace = true;
-                    }
-                    else if (c == '\n' || c == '\r') {
-                        if (c == '\r') {
+
+                    switch (c) {
+                    	case -1:
+                    		if (fReportErrors_) {
+                    			fErrorReporter.reportError("HTML1007", null);
+                    		}
+                    		throw new EOFException();
+                    	case ' ':
+                    	case '\t':
+                            if (acceptSpace) {
+                                fStringBuffer.append(lNormalizeAttributes_ ? ' ' : (char) c);
+                            }
+                            prevSpace = true;
+                            break;
+                    	case '\n':
+                            if (acceptSpace) {
+                                fStringBuffer.append(lNormalizeAttributes_ ? ' ' : '\n');
+                            }
+                            fCurrentEntity.incLine();
+                            prevSpace = true;
+                            break;
+                    	case '\r':
                             final int c2 = fCurrentEntity.read();
                             if (c2 == '\n') {
                                 c = c2;
@@ -3026,42 +3034,43 @@ public class HTMLScanner implements XMLDocumentScanner, XMLLocator, HTMLComponen
                             else if (c2 != -1) {
                                 fCurrentEntity.rewind();
                             }
-                        }
-                        if (acceptSpace) {
-                            fStringBuffer.append(lNormalizeAttributes_ ? ' ' : '\n');
-                        }
-                        fCurrentEntity.incLine();
-                        prevSpace = true;
-                    }
-                    else if (c == '&') {
-                        isStart = false;
-                        final int ce = scanEntityRef(fStringBuffer2, false);
-                        if (ce != -1) {
-                            try {
-                                fStringBuffer.appendCodePoint(ce);
+                            if (acceptSpace) {
+                                fStringBuffer.append(lNormalizeAttributes_ ? ' ' : '\n');
                             }
-                            catch (IllegalArgumentException e) {
-                                if (fReportErrors_) {
-                                    fErrorReporter.reportError("HTML1005", new Object[] {"&#" + ce + ';'});
-                                }
-                            }
-                        }
-                        else {
-                            fStringBuffer.append(fStringBuffer2);
-                        }
-                        prevSpace = false;
-                    }
-                    else if (c != quote) {
-                        isStart = false;
-                        try {
-                            fStringBuffer.appendCodePoint(c);
-                        }
-                        catch (IllegalArgumentException e) {
-                            if (fReportErrors_) {
-                                fErrorReporter.reportError("HTML1005", new Object[] {"&#" + c + ';'});
-                            }
-                        }
-                        prevSpace = false;
+                            fCurrentEntity.incLine();
+                            prevSpace = true;
+                            break;
+                    	case '&':
+	                        isStart = false;
+	                        final int ce = scanEntityRef(fStringBuffer2, false);
+	                        if (ce != -1) {
+	                            try {
+	                                fStringBuffer.appendCodePoint(ce);
+	                            }
+	                            catch (IllegalArgumentException e) {
+	                                if (fReportErrors_) {
+	                                    fErrorReporter.reportError("HTML1005", new Object[] {"&#" + ce + ';'});
+	                                }
+	                            }
+	                        }
+	                        else {
+	                        	fStringBuffer.append(fStringBuffer2);
+	                        }
+	                        prevSpace = false;
+	                        break;
+	                    default:
+		                    if (c != quote) {
+		                        isStart = false;
+		                        try {
+		                            fStringBuffer.appendCodePoint(c);
+		                        }
+		                        catch (IllegalArgumentException e) {
+		                            if (fReportErrors_) {
+		                                fErrorReporter.reportError("HTML1005", new Object[] {"&#" + c + ';'});
+		                            }
+		                        }
+		                        prevSpace = false;
+		                    }
                     }
                     // moved into IFs to safe on conditions
                     // prevSpace = c == ' ' || c == '\t' || c == '\r' || c == '\n';
