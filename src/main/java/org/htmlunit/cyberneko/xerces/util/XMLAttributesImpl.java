@@ -50,15 +50,12 @@ public class XMLAttributesImpl implements XMLAttributes {
     public XMLAttributesImpl(final XMLAttributesImpl attributes) {
         final ArrayList<Attribute> attribs = attributes.getAttributes();
         final int length = attribs.size();
-        if (length > 0) {
-            attributes_ = new ArrayList<>(length);
-            for (int i = 0; i < length; i++) {
-                attributes_.add(attribs.get(i).clone());
-            }
-            return;
+        
+        // a list of size 0 is acceptable if we don't have any attributes
+        attributes_ = new ArrayList<>(length);
+        for (int i = 0; i < length; i++) {
+            attributes_.add(attribs.get(i).clone());
         }
-
-        attributes_ = new ArrayList<>();
     }
 
     /**
