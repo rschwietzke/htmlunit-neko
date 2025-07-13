@@ -2734,8 +2734,9 @@ public class HTMLScanner implements XMLDocumentSource, XMLLocator, HTMLComponent
          */
         protected String scanStartElement(final boolean[] empty) throws IOException {
             String ename = scanTagName();
-            final int length = ename != null ? ename.length() : 0;
-            if (length == 0) {
+            
+            // ename is always either null or has content, so we need only this check
+            if (ename == null) {
                 if (fReportErrors_) {
                     fErrorReporter.reportError("HTML1009", null);
                 }
