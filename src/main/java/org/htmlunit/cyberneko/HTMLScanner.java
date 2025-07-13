@@ -2764,50 +2764,11 @@ public class HTMLScanner implements XMLDocumentSource, XMLLocator, HTMLComponent
             fBeginLineNumber = beginLineNumber;
             fBeginColumnNumber = beginColumnNumber;
             fBeginCharacterOffset = beginCharacterOffset;
+            
             if (fElementDepth == -1) {
-                if (fByteStream != null && !fIgnoreSpecifiedCharset_ && "META".equalsIgnoreCase(ename)) {
-                    if (DEBUG_CHARSET) {
-                        System.out.println("+++ <META>");
-                    }
-                    final String httpEquiv = getValue(attributes_, "http-equiv");
-                    if ("content-type".equalsIgnoreCase(httpEquiv)) {
-                        if (DEBUG_CHARSET) {
-                            System.out.println("+++ @content-type: \"" + httpEquiv + '"');
-                        }
-                        String content = getValue(attributes_, "content");
-                        if (content != null) {
-                            content = removeSpaces(content);
-                            final int index1 = content.toLowerCase(Locale.ROOT).indexOf("charset=");
-                            if (index1 != -1) {
-                                final int index2 = content.indexOf(';', index1);
-                                final String charset = index2 != -1 ? content.substring(index1 + 8, index2)
-                                        : content.substring(index1 + 8);
-                                changeEncoding(charset);
-                            }
-                        }
-                    }
-                    else {
-                        final String metaCharset = getValue(attributes_, "charset");
-                        if (metaCharset != null) {
-                            changeEncoding(metaCharset);
-                        }
-                    }
-                }
-                else if (fByteStream != null && "BODY".equalsIgnoreCase(ename)) {
-                    fByteStream.clear();
-                    fByteStream = null;
-                }
-                else {
-                    if (fByteStream != null) {
-                        final HTMLElements.Element element = htmlConfiguration_.getHtmlElements().getElement(ename);
-                        if (element.parent != null
-                                && element.parent.length > 0
-                                && element.parent[0].code == HTMLElements.BODY) {
-                            fByteStream.clear();
-                            fByteStream = null;
-                        }
-                    }
-                }
+                // this is very rare, so this code gets is own method to make this 
+                // method more compact and enable better inlining and shorter jumps
+                handleCharsetChange(ename);
             }
 
             if (fElementCount >= fElementDepth) {
@@ -2815,7 +2776,7 @@ public class HTMLScanner implements XMLDocumentSource, XMLLocator, HTMLComponent
                 if (DEBUG_CALLBACKS) {
                     System.out.println("startElement(" + qName_ + ',' + attributes_ + ")");
                 }
-                if (empty[0] && !"BR".equalsIgnoreCase(ename)) {
+                if (empty[0] && !"br".equalsIgnoreCase(ename)) {
                     fDocumentHandler.emptyElement(qName_, attributes_, locationAugs(fCurrentEntity));
                 }
                 else {
@@ -2825,6 +2786,60 @@ public class HTMLScanner implements XMLDocumentSource, XMLLocator, HTMLComponent
             return ename;
         }
 
+        /**
+         * Handles a change of the encoding, if necessary.
+         * 
+         * If the encoding has changed, the scanner will be reset to the beginning of
+         * the input stream and the already parsed elements will be skipped.
+         * 
+         * @param ename the name of the element that is currently processed
+         */
+        private void handleCharsetChange(String ename) {
+            if (fByteStream != null && !fIgnoreSpecifiedCharset_ && "META".equalsIgnoreCase(ename)) {
+                if (DEBUG_CHARSET) {
+                    System.out.println("+++ <META>");
+                }
+                final String httpEquiv = getValue(attributes_, "http-equiv");
+                if ("content-type".equalsIgnoreCase(httpEquiv)) {
+                    if (DEBUG_CHARSET) {
+                        System.out.println("+++ @content-type: \"" + httpEquiv + '"');
+                    }
+                    String content = getValue(attributes_, "content");
+                    if (content != null) {
+                        content = removeSpaces(content);
+                        final int index1 = content.toLowerCase(Locale.ROOT).indexOf("charset=");
+                        if (index1 != -1) {
+                            final int index2 = content.indexOf(';', index1);
+                            final String charset = index2 != -1 ? content.substring(index1 + 8, index2)
+                                    : content.substring(index1 + 8);
+                            changeEncoding(charset);
+                        }
+                    }
+                }
+                else {
+                    final String metaCharset = getValue(attributes_, "charset");
+                    if (metaCharset != null) {
+                        changeEncoding(metaCharset);
+                    }
+                }
+            }
+            else if (fByteStream != null && "BODY".equalsIgnoreCase(ename)) {
+                fByteStream.clear();
+                fByteStream = null;
+            }
+            else {
+                if (fByteStream != null) {
+                    final HTMLElements.Element element = htmlConfiguration_.getHtmlElements().getElement(ename);
+                    if (element.parent != null
+                            && element.parent.length > 0
+                            && element.parent[0].code == HTMLElements.BODY) {
+                        fByteStream.clear();
+                        fByteStream = null;
+                    }
+                }
+            }
+        }
+        
         /**
          * Removes all spaces for the string (remember: JDK 1.3!)
          */
