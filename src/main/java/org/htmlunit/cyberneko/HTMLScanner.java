@@ -1096,13 +1096,11 @@ public class HTMLScanner implements XMLDocumentSource, XMLLocator, HTMLComponent
 
     // Modifies the given name based on the specified mode.
     protected static String modifyName(final String name, final short mode) {
-        if (NAMES_UPPERCASE == mode) {
-            return name.toUpperCase(Locale.ROOT);
+        // shortcut here because that is the most common case
+        if (NAMES_NO_CHANGE == mode) {
+            return name;
         }
-        if (NAMES_LOWERCASE == mode) {
-            return name.toLowerCase(Locale.ROOT);
-        }
-        return name;
+        return NAMES_UPPERCASE == mode ? name.toUpperCase(Locale.ROOT) : name.toLowerCase(Locale.ROOT);
     }
 
     // Converts HTML names string value to constant value.
