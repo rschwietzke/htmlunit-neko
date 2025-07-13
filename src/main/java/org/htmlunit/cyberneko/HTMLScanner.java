@@ -2744,10 +2744,15 @@ public class HTMLScanner implements XMLDocumentSource, XMLLocator, HTMLComponent
                 }
                 return null;
             }
+            
             ename = modifyName(ename, fNamesElems);
-            if (attributes_.getLength() != 0) {
-                attributes_.removeAllAttributes();
-            }
+
+            // attributes is a recycled object, so we need to clear it
+            // we don't check first if we have too, we simply assume it 
+            // is mostly not empty and if we are wrong, no harm is done
+            // the underlying ArrayList will not allocate a new array anyway
+            attributes_.removeAllAttributes();
+            
             final int beginLineNumber = fBeginLineNumber;
             final int beginColumnNumber = fBeginColumnNumber;
             final int beginCharacterOffset = fBeginCharacterOffset;
