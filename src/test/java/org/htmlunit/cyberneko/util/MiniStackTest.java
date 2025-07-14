@@ -15,9 +15,10 @@
  */
 package org.htmlunit.cyberneko.util;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -196,4 +197,49 @@ public class MiniStackTest {
             assertNull(m.pop());
         }
     }
+    
+    @Test
+    public void getEmpty() {
+        // empty
+        final MiniStack<String> m = new MiniStack<>();
+        assertEquals(0, m.size());
+    
+        // this will silently return null and not throw an exception!!
+        assertNull(m.get(0));
+    }
+    
+    @Test
+    public void getNormal() {
+        // one
+        {
+            final MiniStack<String> m = new MiniStack<>();
+            m.push("foo");
+            assertEquals("foo", m.get(0));
+        }
+        // two
+        {
+            final MiniStack<String> m = new MiniStack<>();
+            m.push("1");
+            m.push("2");
+            assertEquals("1", m.get(0));
+            assertEquals("2", m.get(1));
+        }
+    }
+
+    @Test
+    public void getBeyondEnd() {
+        final MiniStack<String> m = new MiniStack<>();
+        m.push("foo");
+        m.push("bar");
+        assertEquals("foo", m.get(0));
+        assertEquals("bar", m.get(1));
+
+        // this will silently return null and not throw an exception!!
+        assertNull(m.get(2));
+        
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> {
+            m.get(12);
+        });
+    }
+
 }

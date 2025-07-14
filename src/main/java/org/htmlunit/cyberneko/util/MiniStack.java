@@ -18,6 +18,8 @@ import java.util.Arrays;
 
 /**
  * Extremely light stack implementation. Perfect for inlining.
+ * Please be aware that this stack does not check for all kinds of
+ * possible error states in favour of performance.
  *
  * @author Ren&eacute; Schwietzke
  * @since 3.10.0
@@ -119,6 +121,21 @@ public class MiniStack<E> {
         return pos_ < 0;
     }
 
+    /**
+     * Returns the element at a given position. 0 is the lowest object.
+     * 
+     * Attention: For performance reasons this method does not check
+     * if the position is valid and might fail with an array index out 
+     * of bounds exception.
+     * 
+     * @param pos the position to return
+     * @return the element at the given position
+     */
+    @SuppressWarnings("unchecked")
+    public E get(final int pos) {
+        return (E) this.elements_[pos];
+    }
+    
     /**
      * Returns the current size of the stack.
      *
